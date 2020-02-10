@@ -9,7 +9,7 @@
   export default {
     data() {
       return {
-        outputs1: []
+        outputs2: [],
       }
     },
     mounted() {
@@ -41,13 +41,15 @@
             console.log(ws);
             that.outputs1 = [];//清空接收数据
             for(var i= 0;i<ws.length;i++){
-              that.outputs1.push(ws[i].姓名);
+              if (ws[i][" 班级（如1801）"] == ' 1815'){
+                that.outputs2.push(ws[i][" 学生姓名"]);
+              }
             }
-            console.log(that.outputs1);
-            var list = that.outputs1;
-            this.postRequest('/chick/template',{list}).then(resp => {
-              // if (resp && resp.status == 200)
-            });
+            console.log(that.outputs2);
+            var list = that.outputs2;
+            // this.postRequest('/chick/template',{list}).then(resp => {
+            //   // if (resp && resp.status == 200)
+            // });
             this.$refs.upload.value = '';
 
           } catch (e) {
