@@ -384,7 +384,6 @@
                         var list = that.outputs2;
                         var template = Cookies.get('template');
                         template = template.split("-");
-                        this.init();
                         this.postRequest('/chick/template',{template}).then(resp => {
                             // if (resp && resp.status == 200)
                         });
@@ -398,6 +397,7 @@
                                 });
                             }
                         });
+                        this.init();
                         this.$refs.upload.value = '';
                     } catch (e) {
                         return false;
