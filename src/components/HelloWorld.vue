@@ -23,7 +23,10 @@
                             <h5>当前无班级名单 <i class="el-icon-edit" @click="activeName = 'third'">点击添加</i></h5>
                         </template>
                         <template v-if="namelist.length != 0">
-                            <h5>当前存在班级名单： <el-button type="success" icon="el-icon-search" @click="dialogVisible = true" circle></el-button></h5>
+                            <h5>当前存在班级名单：
+                                <el-button type="success" icon="el-icon-search" @click="dialogVisible = true" circle></el-button>
+                                <el-button type="danger" icon="el-icon-delete" circle @click="deleteClassList()"></el-button>
+                            </h5>
                         </template>
                     </el-tab-pane>
                     <el-tab-pane label="作业对比" name="second">
@@ -56,7 +59,10 @@
                             <h5>当前无班级名单  <i class="el-icon-edit" @click="activeName = 'third'">点击添加</i></h5>
                         </template>
                         <template v-if="namelist.length != 0">
-                            <h5>当前存在班级名单： <el-button type="success" icon="el-icon-search" @click="dialogVisible = true" circle></el-button></h5>
+                            <h5>当前存在班级名单：
+                                <el-button type="success" icon="el-icon-search" @click="dialogVisible = true" circle></el-button>
+                                <el-button type="danger" icon="el-icon-delete" circle @click="deleteClassList()"></el-button>
+                            </h5>
                         </template>
                     </el-tab-pane>
                     <el-tab-pane label="导入班级名单" name="third">
@@ -80,13 +86,25 @@
                             <h5>当前无班级名单</h5>
                         </template>
                         <template v-if="namelist.length != 0">
-                            <h5>当前存在班级名单： <el-button type="success" icon="el-icon-search" @click="dialogVisible = true" circle></el-button></h5>
+                            <h5>当前存在班级名单：
+                                <el-button type="success" icon="el-icon-search" @click="dialogVisible = true" circle></el-button>
+                                <el-button type="danger" icon="el-icon-delete" circle @click="deleteClassList()"></el-button>
+                            </h5>
                         </template>
                     </el-tab-pane>
-                    <el-tab-pane label="*导入及注意事项*" name="fourth">
-                        导入时请保证姓名学生表格中姓名列的第一行为“姓名”
-                        <br>
-
+                    <el-tab-pane label="*使用文档及注意事项*" name="fourth">
+                        <h4>概述</h4>
+                        右侧对比结果仅显示当次对比结果，并无历史对比记录<br>
+                        第一次使用应先导入班级名单，后续使用无需导入（如果更换浏览器需重新导入）<br>
+                        如果对比存在问题可以刷新页面重新对比，或者删除班级名单重新导入后对比<br>
+                        如若还有错误可能是原始数据所造成的问题，可以人工比对。数据正确而问题依旧存在！！程序BUG请见谅<br>
+                        **注：签到信息的填写如果有除姓名以外的其他内容依旧会出现对比存在错误的情况发生，为正常现象**
+                        <h4>数据要求说明</h4>
+                        <div class="demo-image__preview">
+                            <h5>导入班级名单（只使用到姓名）</h5>
+                            <img  src="../assets/input.png"></img><br>
+                            其余签到Excel及作业Excel对比只需下载后直接上传即可
+                        </div>
                     </el-tab-pane>
                 </el-tabs>
             </div></el-col>
@@ -118,6 +136,7 @@
 <script>
     import XLSX from "xlsx";
     import Cookies from 'js-cookie'
+    import input from '../assets/input.png'
 
     export default {
         data() {
@@ -256,6 +275,9 @@
                 if (Cookies.get("template").split("-") != null){
                     this.namelist = Cookies.get("template").split("-");
                 }
+                if (Cookies.get("classnumber") != null){
+                    this.classnumber = Cookies.get("classnumber");
+                }
             },
             /**
              * 文件状态改变时的钩子，添加文件、上传成功和上传失败时都会被调用。
@@ -358,9 +380,11 @@
                                 that.outputs2.push(ws[i][" 学生姓名"]);
                             }
                         }
+                        Cookies.set("classnumber",this.classnumber,{expires:40});
                         var list = that.outputs2;
                         var template = Cookies.get('template');
                         template = template.split("-");
+                        this.init();
                         this.postRequest('/chick/template',{template}).then(resp => {
                             // if (resp && resp.status == 200)
                         });
@@ -380,6 +404,12 @@
                     }
                 };
                 fileReader.readAsBinaryString(e);
+            },
+            deleteClassList(){
+                Cookies.remove("template");
+                Cookies.remove("classnumber");
+                this.namelist = [];
+                this.$router.go(0);
             }
         }
     }
